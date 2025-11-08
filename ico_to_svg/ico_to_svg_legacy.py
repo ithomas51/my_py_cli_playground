@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SCHEDULE FOR DELETION: Deprecated shim file, use console scripts instead
+# This file was renamed from ico_to_svg.py to avoid import conflicts
+# Can be removed once users migrate to ico-to-svg/ico2svg console scripts
 """Deprecated entry point.
 
 Use the installed console script `ico-to-svg` (or alias `ico2svg`).

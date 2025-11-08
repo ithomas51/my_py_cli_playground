@@ -1,3 +1,6 @@
+# SCHEDULE FOR DELETION: Legacy smoke test, superseded by pytest integration tests
+# References non-existent .venv_cli and data/ directories
+# All functionality covered by tests/integration/
 """Simple smoke tests for ico-to-svg CLI logic."""
 
 import subprocess

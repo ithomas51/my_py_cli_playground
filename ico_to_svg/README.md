@@ -68,6 +68,4 @@ Legacy script invocation (`python ico_to_svg.py ...`) is deprecated; use `ico-to
 pip install build
 py -m build
 ```
-
-## License
-MIT (see pyproject). Modify as needed.
+## Private (NO LICENSE FILE INCLUDED)

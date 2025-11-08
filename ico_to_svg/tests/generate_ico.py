@@ -1,3 +1,6 @@
+# SCHEDULE FOR DELETION: Manual test data generator, superseded by conftest.py fixtures
+# All test ICO generation is now handled dynamically in tests/conftest.py
+# No longer needed as pytest creates test files on-the-fly
 from pathlib import Path
 
 from PIL import Image
