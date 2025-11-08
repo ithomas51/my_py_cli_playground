@@ -125,7 +125,7 @@ if ($BadPatterns.Count -eq 0) {
     Write-Host "  Found $($BadPatterns.Count) unsafe variable interpolations:"
     foreach ($match in $BadPatterns) {
         $line = ($ScriptContent.Substring(0, $match.Index) -split "`n").Count
-        Write-Host "    Line $line: $($match.Value)"
+        Write-Host "    Line ${line}: $($match.Value)"
     }
     exit 1
 }
