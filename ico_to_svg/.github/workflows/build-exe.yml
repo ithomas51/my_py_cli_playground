@@ -1,0 +1,70 @@
+name: Build Windows Executable
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-exe:
+    name: Build Windows Executable
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pyinstaller
+
+      - name: Build executable with PyInstaller
+        run: |
+          pyinstaller ico_to_svg.spec
+
+      - name: Create alias executable
+        run: |
+          Copy-Item dist\ico-to-svg.exe dist\ico2svg.exe
+
+      - name: Test executable
+        run: |
+          dist\ico-to-svg.exe --version
+          dist\ico-to-svg.exe --help
+          dist\ico2svg.exe --version
+
+      - name: Calculate checksums
+        run: |
+          Get-FileHash dist\ico-to-svg.exe -Algorithm SHA256 | Select-Object Hash | Out-File -FilePath dist\ico-to-svg.exe.sha256
+          Get-FileHash dist\ico2svg.exe -Algorithm SHA256 | Select-Object Hash | Out-File -FilePath dist\ico2svg.exe.sha256
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ico-to-svg-windows-exe
+          path: |
+            dist/ico-to-svg.exe
+            dist/ico2svg.exe
+            dist/*.sha256
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/ico-to-svg.exe
+            dist/ico2svg.exe
+            dist/ico-to-svg.exe.sha256
+            dist/ico2svg.exe.sha256
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

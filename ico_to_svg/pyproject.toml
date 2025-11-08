@@ -1,0 +1,119 @@
+[build-system]
+requires = ["hatchling>=1.18.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ico-to-svg"
+version = "0.1.0"
+description = "Convert Windows ICO files to SVG (raster embed or naive vectorized rectangles)."
+readme = "README.md"
+authors = [ { name = "ian thomas", email = "ithomas@bellevuehealthcare.com" } ]
+license = { text = "MIT" }
+requires-python = ">=3.10"
+keywords = ["ico", "svg", "icon", "conversion", "image"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent"
+]
+dependencies = [
+  "Pillow>=10.0.0",
+  "svgwrite>=1.4.3"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.4",
+  "pytest-cov>=4.1",
+  "mypy>=1.7",
+  "ruff>=0.1.8",
+  "build>=1.0",
+  "twine>=4.0",
+]
+test = [
+  "pytest>=7.4",
+  "pytest-cov>=4.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/ithomas51/my_py_cli_playground/tree/main/ico-to-svg"
+Repository = "https://github.com/ithomas51/my_py_cli_playground"
+Issues = "https://github.com/ithomas51/my_py_cli_playground/issues"
+Gist = "https://gist.github.com/ithomas51/c4dbcc2b02a0bf3c12725efc8a400aaf"
+
+[project.scripts]
+ico-to-svg = "ico_to_svg.cli:main"
+ico2svg = "ico_to_svg.cli:main"
+
+[tool.hatch.build]
+packages = ["src/ico_to_svg"]
+
+[tool.hatch.version]
+path = "src/ico_to_svg/__init__.py"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+strict_equality = true
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = "svgwrite.*"
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # flake8-bugbear
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "ARG",  # flake8-unused-arguments
+    "SIM",  # flake8-simplify
+]
+ignore = [
+    "E501",  # Line too long (handled by formatter)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ARG001"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--tb=short",
+    "--cov=src/ico_to_svg",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
