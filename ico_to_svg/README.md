@@ -11,8 +11,30 @@ Convert Windows `.ico` files to `.svg` via either:
 * Vector mode with adjustable `--alpha-threshold` (default 16)
 * Optional background compositing (e.g. `--background "#ffffff"` or `transparent`)
 * JSON output for size introspection (`info --json`)
+* **Standalone Windows executable** - No Python installation required!
 
-## Install (Recommended: pipx)
+## Installation
+
+### Option 1: Standalone Windows Executable (Recommended)
+
+Download the pre-built executable from [Releases](https://github.com/ithomas51/my_py_cli_playground/releases) - **no Python installation required!**
+
+```powershell
+# Quick install (requires Administrator)
+New-Item -Path "C:\Program Files\ico-to-svg" -ItemType Directory -Force
+Copy-Item ico-to-svg.exe "C:\Program Files\ico-to-svg\"
+
+# Add to PATH
+$oldPath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
+[Environment]::SetEnvironmentVariable('Path', "$oldPath;C:\Program Files\ico-to-svg", 'Machine')
+
+# Verify (restart terminal first)
+ico-to-svg --version
+```
+
+See [INSTALL_WINDOWS_EXE.md](INSTALL_WINDOWS_EXE.md) for detailed installation instructions, PowerShell install script, and troubleshooting.
+
+### Option 2: Python Package (pipx)
 ```powershell
 pipx install .
 # Or from a Git repo:
@@ -63,9 +85,21 @@ convert_ico_to_svg("icon.ico", "icon.svg", mode="vector", alpha_threshold=16, si
 ## Deprecation Notice
 Legacy script invocation (`python ico_to_svg.py ...`) is deprecated; use `ico-to-svg`. Shim will be removed after two minor releases.
 
-## Build Wheel
+## Building
+
+### Build Python Wheel
 ```powershell
 pip install build
 py -m build
 ```
+
+### Build Windows Executable
+```powershell
+pip install pyinstaller
+pyinstaller ico_to_svg.spec
+Copy-Item dist\ico-to-svg.exe dist\ico2svg.exe
+```
+
+See [BUILD_EXE.md](BUILD_EXE.md) for detailed build instructions.
+
 ## Private (NO LICENSE FILE INCLUDED)
