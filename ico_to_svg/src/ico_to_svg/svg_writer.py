@@ -4,10 +4,9 @@ import base64
 import io
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Tuple
 
-from PIL import Image
 import svgwrite
+from PIL import Image
 
 
 @dataclass
@@ -31,7 +30,7 @@ class Run:
 
 def vectorize(
     image: Image.Image, alpha_threshold: int
-) -> Tuple[Dict[Tuple[int, int, int, int], List[Run]], int, int]:
+) -> tuple[dict[tuple[int, int, int, int], list[Run]], int, int]:
     """Vectorize an image into horizontal runs grouped by color.
 
     Parameters
@@ -66,11 +65,18 @@ def vectorize(
     """
     w, h = image.size
     pixels = image.load()
-    color_runs: Dict[Tuple[int, int, int, int], List[Run]] = {}
+    if pixels is None:
+        raise ValueError("Failed to load image pixels")
+
+    color_runs: dict[tuple[int, int, int, int], list[Run]] = {}
     for y in range(h):
         x = 0
         while x < w:
-            r, g, b, a = pixels[x, y]
+            pixel = pixels[x, y]
+            if not isinstance(pixel, tuple) or len(pixel) < 4:
+                x += 1
+                continue
+            r, g, b, a = int(pixel[0]), int(pixel[1]), int(pixel[2]), int(pixel[3])
             if a < alpha_threshold:
                 x += 1
                 continue
@@ -78,7 +84,10 @@ def vectorize(
             x_start = x
             x += 1
             while x < w:
-                r2, g2, b2, a2 = pixels[x, y]
+                pixel2 = pixels[x, y]
+                if not isinstance(pixel2, tuple) or len(pixel2) < 4:
+                    break
+                r2, g2, b2, a2 = int(pixel2[0]), int(pixel2[1]), int(pixel2[2]), int(pixel2[3])
                 if a2 < alpha_threshold or (r2, g2, b2) != (r, g, b):
                     break
                 x += 1
@@ -87,7 +96,7 @@ def vectorize(
     return color_runs, w, h
 
 
-def runs_to_path_d(runs: List[Run]) -> str:
+def runs_to_path_d(runs: list[Run]) -> str:
     """Convert runs into SVG path data string.
 
     Parameters
@@ -115,12 +124,12 @@ def runs_to_path_d(runs: List[Run]) -> str:
         x1 = run.x1
         x2 = run.x2 + 1  # exclusive for H command
         y = run.y
-        parts.append(f"M{x1},{y}H{x2}V{y+1}H{x1}Z")
+        parts.append(f"M{x1},{y}H{x2}V{y + 1}H{x1}Z")
     return " ".join(parts)
 
 
 def write_svg_vector(
-    color_runs: Dict[Tuple[int, int, int, int], List[Run]],
+    color_runs: dict[tuple[int, int, int, int], list[Run]],
     width: int,
     height: int,
     output: Path | str,
@@ -155,16 +164,14 @@ def write_svg_vector(
     )
     if background and background != "transparent":
         dwg.add(dwg.rect(insert=(0, 0), size=(width, height), fill=background))
-    for (r, g, b, a), runs in color_runs.items():
+    for (r, g, b, _a), runs in color_runs.items():
         fill = f"#{r:02x}{g:02x}{b:02x}"
         d = runs_to_path_d(runs)
         dwg.add(dwg.path(d=d, fill=fill, stroke="none"))
     dwg.save()
 
 
-def write_svg_raster(
-    image: Image.Image, output: Path | str, background: str | None = None
-) -> None:
+def write_svg_raster(image: Image.Image, output: Path | str, background: str | None = None) -> None:
     """Write raster SVG with base64-embedded PNG.
 
     Parameters

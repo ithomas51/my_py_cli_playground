@@ -2,7 +2,6 @@
 
 from pathlib import Path
 
-import pytest
 from PIL import Image
 
 from ico_to_svg.svg_writer import Run, runs_to_path_d, vectorize, write_svg_raster, write_svg_vector

@@ -1,5 +1,6 @@
-from PIL import Image
 from pathlib import Path
+
+from PIL import Image
 
 # Ensure data directory exists
 out_dir = Path(__file__).resolve().parents[1] / "data"

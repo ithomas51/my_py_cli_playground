@@ -1,7 +1,8 @@
 """Simple smoke tests for ico-to-svg CLI logic."""
-from pathlib import Path
+
 import subprocess
 import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 VENV = ROOT / ".venv_cli" / "Scripts"
@@ -25,8 +26,22 @@ def main():
         sys.exit(1)
     run([str(CLI), "info", str(ICO), "--json"])
     run([str(CLI), "convert", str(ICO), str(DATA / "test-64-raster.svg"), "--size", "64"])
-    run([str(CLI), "convert", str(ICO), str(DATA / "test-64-vector.svg"), "--size", "64", "--mode", "vector", "--alpha-threshold", "16"])
+    run(
+        [
+            str(CLI),
+            "convert",
+            str(ICO),
+            str(DATA / "test-64-vector.svg"),
+            "--size",
+            "64",
+            "--mode",
+            "vector",
+            "--alpha-threshold",
+            "16",
+        ]
+    )
     print("Smoke tests passed.")
+
 
 if __name__ == "__main__":
     main()

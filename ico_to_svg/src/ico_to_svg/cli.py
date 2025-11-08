@@ -3,13 +3,12 @@
 import argparse
 import json
 import sys
-from typing import List
 
 from .core import convert_ico_to_svg
 from .ico_parser import load_ico_frames, parse_size_arg, select_size
 
 
-def main(argv: List[str] | None = None) -> None:
+def main(argv: list[str] | None = None) -> None:
     """Entry point for ico-to-svg CLI.
 
     Parameters
@@ -101,6 +100,5 @@ def main(argv: List[str] | None = None) -> None:
             print("No sizes found")
         else:
             print("Available sizes:")
-            for (w, h) in sorted(sizes, key=lambda s: (s[0] * s[1], s[0], s[1])):
+            for w, h in sorted(sizes, key=lambda s: (s[0] * s[1], s[0], s[1])):
                 print(f" - {w}x{h}")
-

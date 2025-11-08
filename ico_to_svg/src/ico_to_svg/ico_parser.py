@@ -1,12 +1,11 @@
 """ICO file parsing and size selection logic."""
 
 from pathlib import Path
-from typing import List, Tuple
 
 from PIL import Image
 
 
-def parse_size_arg(size_str: str) -> Tuple[int, int]:
+def parse_size_arg(size_str: str) -> tuple[int, int]:
     """Parse size argument like '256' or '256x256'.
 
     Parameters
@@ -44,7 +43,7 @@ def parse_size_arg(size_str: str) -> Tuple[int, int]:
     return w, h
 
 
-def load_ico_frames(path: Path | str) -> List[Tuple[int, int]]:
+def load_ico_frames(path: Path | str) -> list[tuple[int, int]]:
     """Load available frame sizes from an ICO file.
 
     Parameters
@@ -90,8 +89,8 @@ def load_ico_frames(path: Path | str) -> List[Tuple[int, int]]:
 
 
 def select_size(
-    available: List[Tuple[int, int]], desired: Tuple[int, int] | None
-) -> Tuple[int, int]:
+    available: list[tuple[int, int]], desired: tuple[int, int] | None
+) -> tuple[int, int]:
     """Select ICO frame size using priority rules.
 
     Selection priority:
@@ -148,7 +147,7 @@ def select_size(
     return largest
 
 
-def open_ico_at_size(path: Path | str, size: Tuple[int, int]) -> Image.Image:
+def open_ico_at_size(path: Path | str, size: tuple[int, int]) -> Image.Image:
     """Open an ICO file at a specific size.
 
     Parameters
@@ -165,7 +164,7 @@ def open_ico_at_size(path: Path | str, size: Tuple[int, int]) -> Image.Image:
 
     Notes
     -----
-    Pillow may select the closest available size if exact match doesn't exist.
+    Uses PIL's low-level ICO API to load specific size.
     Always returns RGBA mode for consistent processing.
 
     Examples
@@ -176,9 +175,18 @@ def open_ico_at_size(path: Path | str, size: Tuple[int, int]) -> Image.Image:
     >>> img.mode
     'RGBA'
     """
-    try:
-        im = Image.open(str(path), sizes=[size])
-        return im.convert("RGBA")
-    except Exception:
-        im = Image.open(str(path))
+    from PIL import IcoImagePlugin
+
+    with open(str(path), "rb") as f:
+        ico_file = IcoImagePlugin.IcoFile(f)
+
+        # Find entry matching requested size
+        for i, entry in enumerate(ico_file.entry):
+            if entry.dim == size:
+                # Load the specific entry
+                im = ico_file.frame(i)
+                return im.convert("RGBA")
+
+        # If exact match not found, load largest (first entry)
+        im = ico_file.frame(0)
         return im.convert("RGBA")

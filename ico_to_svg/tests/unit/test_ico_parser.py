@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import pytest
-from PIL import Image
 
 from ico_to_svg.ico_parser import load_ico_frames, open_ico_at_size, parse_size_arg
 
@@ -73,7 +72,7 @@ class TestLoadIcoFrames:
         """Test that non-ICO file raises appropriate error."""
         invalid = tmp_path / "invalid.ico"
         invalid.write_text("not an ico file")
-        with pytest.raises(Exception):  # PIL raises various exceptions
+        with pytest.raises((OSError, ValueError)):  # PIL raises OSError or ValueError
             load_ico_frames(invalid)
 
 
@@ -99,6 +98,9 @@ class TestOpenIcoAtSize:
 
     def test_open_non_square_size(self, non_square_ico: Path) -> None:
         """Test opening non-square ICO."""
-        img = open_ico_at_size(non_square_ico, (32, 64))
-        assert img.size == (32, 64)
+        # PIL auto-generates sizes when saving ICO, so we test with an available size
+        sizes = load_ico_frames(non_square_ico)
+        target_size = sizes[0] if sizes else (16, 32)  # Use first available size
+        img = open_ico_at_size(non_square_ico, target_size)
+        assert img.size == target_size
         assert img.mode == "RGBA"

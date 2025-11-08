@@ -39,9 +39,7 @@ class TestInfoCommand:
         captured = capsys.readouterr()
         assert "32x32" in captured.out
 
-    def test_info_json_with_size_filter(
-        self, multi_size_ico: Path, capsys
-    ) -> None:
+    def test_info_json_with_size_filter(self, multi_size_ico: Path, capsys) -> None:
         """Test info command with JSON and size filter."""
         main(["info", str(multi_size_ico), "--json", "--size", "64"])
         captured = capsys.readouterr()
