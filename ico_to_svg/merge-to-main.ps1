@@ -22,11 +22,19 @@
 
 .EXAMPLE
     .\merge-to-main.ps1
+    # Uses current branch (cli/ico-to-svg) and default commit message
+
+.EXAMPLE
+    .\merge-to-main.ps1 -BranchName "cli/ico-to-svg"
+    # Explicitly specify branch name (useful if on main)
+
+.EXAMPLE
     .\merge-to-main.ps1 -BranchName "feature/my-feature" -CommitMessage "feat: My feature"
+    # Custom branch and commit message
 #>
 
 param(
-    [string]$BranchName = "feature/windows-exe-distribution",
+    [string]$BranchName = "cli/ico-to-svg",
     [string]$CommitMessage = "feat: Add Windows standalone executable distribution
 
 - Implement PyInstaller build system with optimized spec file
