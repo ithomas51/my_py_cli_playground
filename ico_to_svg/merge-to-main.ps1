@@ -22,11 +22,19 @@
 
 .EXAMPLE
     .\merge-to-main.ps1
+    # Uses current branch (cli/ico-to-svg) and default commit message
+
+.EXAMPLE
+    .\merge-to-main.ps1 -BranchName "cli/ico-to-svg"
+    # Explicitly specify branch name (useful if on main)
+
+.EXAMPLE
     .\merge-to-main.ps1 -BranchName "feature/my-feature" -CommitMessage "feat: My feature"
+    # Custom branch and commit message
 #>
 
 param(
-    [string]$BranchName = "feature/windows-exe-distribution",
+    [string]$BranchName = "cli/ico-to-svg",
     [string]$CommitMessage = "feat: Add Windows standalone executable distribution
 
 - Implement PyInstaller build system with optimized spec file
@@ -162,13 +170,18 @@ Write-Success "Pushed to origin/$CurrentBranch"
 
 # Create pull request
 Write-Step "Creating pull request"
-$PRTitle = $CommitMessage.Split("`n")[0]  # First line as title
-$PRBody = $CommitMessage.Split("`n", 2)[1].Trim()  # Rest as body
+$CommitLines = $CommitMessage.Split("`n")
+$PRTitle = $CommitLines[0].Trim()  # First line as title
+$PRBody = if ($CommitLines.Count -gt 1) { 
+    ($CommitLines[1..($CommitLines.Count-1)] -join "`n").Trim() 
+} else { 
+    "Automated PR from merge-to-main.ps1" 
+}
 
 Write-Info "Title: $PRTitle"
 Write-Info "Creating PR to merge $CurrentBranch → main"
 
-$PR = gh pr create --title $PRTitle --body $PRBody --base main --head $CurrentBranch 2>&1
+$PR = gh pr create --title "$PRTitle" --body "$PRBody" --base "main" --head "$CurrentBranch" 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Failure "Failed to create pull request"
     Write-Info "Error: $PR"
